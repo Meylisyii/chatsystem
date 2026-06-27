@@ -593,3 +593,4 @@ The `#[Hidden]` attribute on the `User` model must list `'password'`. If you are
 ```bash
 php artisan sanctum:prune-expired --hours=24
 ```
+
