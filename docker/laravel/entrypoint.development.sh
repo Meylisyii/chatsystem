@@ -1,8 +1,10 @@
-#!/bin/sh
+#!/bin/bash
 set -e
 
-rm -f package-lock.json
+# composer install
+# wait $!
+php artisan key:generate
 wait $!
-npm install
+php artisan migrate
 wait $!
-npm run dev -- --host=0.0.0.0 --port=5173
+php artisan serve --host=0.0.0.0 --port=8000

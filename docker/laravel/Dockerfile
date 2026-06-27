@@ -1,11 +1,31 @@
-FROM node:24.12.0-alpine
+FROM php:8.4-cli
 
-WORKDIR /app
+WORKDIR /var/www/html
 
-COPY docker/vuejs/*.sh /usr/local/bin/
+RUN apt-get update && apt-get install -y \
+    git \
+    unzip \
+    libpng-dev \
+    libonig-dev \
+    libxml2-dev \
+    libzip-dev \
+    libjpeg62-turbo-dev \
+    libfreetype6-dev \
+    default-mysql-client \
+    && docker-php-ext-configure gd --with-freetype --with-jpeg \
+    && docker-php-ext-install pdo_mysql mbstring bcmath gd zip pcntl \
+    && rm -rf /var/lib/apt/lists/*
 
-COPY vuejs-app /app
+COPY docker/laravel/*.sh /usr/local/bin/
 
-RUN chmod +x /usr/local/bin/*.sh
+COPY --from=composer:2.9 /usr/bin/composer /usr/bin/composer
 
-EXPOSE 5173
+COPY laravel-app /var/www/html
+
+RUN chown -R www-data:www-data /var/www/html/bootstrap/cache \
+ && chown -R www-data:www-data /var/www/html/storage \
+ && chmod +x /usr/local/bin/*.sh
+
+RUN composer install
+
+EXPOSE 8000
